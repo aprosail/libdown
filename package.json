@@ -15,7 +15,7 @@
   "scripts": {
     "format": "prettier --write .",
     "review": "prettier --check . && oxlint",
-    "build": "tsx src/main.ts"
+    "build": "tsx src/main.ts --lib \"src/@(index|aliases|externals).ts\""
   },
   "dependencies": {
     "commander": "^14.0.2",

@@ -21,6 +21,8 @@ export type TsconfigAliases = {
  * 2. `string`: specified tsconfig.json file path.
  * 3. `object`: specified {@link TsconfigAliases} object.
  *
+ * Currently, it cannot resolve `extends` field in tsconfig.json.
+ *
  * This function encapsulates both {@link tsconfigAliasesFromFile}
  * and {@link tsconfigAliasesFromOptions} for convenience.
  * There are type guards which might cause performance issues.
@@ -43,6 +45,8 @@ export function tsconfigAliases(tsconfig?: string | TsconfigAliases) {
  * 2. `string`: specified tsconfig.json file path.
  * 3. All returned path will be {@link resolve}d.
  *
+ * Currently, it cannot resolve `extends` field in tsconfig.json.
+ *
  * @param file tsconfig.json file path.
  * @returns parsed aliases with resolved paths.
  */
@@ -58,6 +62,8 @@ export function tsconfigAliasesFromFile(file?: string) {
  * and even necessary fields might be undefined,
  * which will only cause an empty returned object.
  * No error will be thrown in such cases.
+ *
+ * Currently, it cannot resolve `extends` field in tsconfig.json.
  *
  * @param options {@link TsconfigAliases} object.
  * @returns parsed aliases with resolved paths.
@@ -81,6 +87,8 @@ export function tsconfigAliasesFromOptions(options?: TsconfigAliases) {
  * 1. `undefined`: use `tsconfig.json` file in current working directory.
  * 2. `string`: specified tsconfig.json file path.
  * 3. `object`: specified {@link TsconfigAliases} object.
+ *
+ * Currently, it cannot resolve `extends` field in tsconfig.json.
  *
  * @param tsconfig tsconfig.json file path or {@link TsconfigAliases} object.
  * @returns rolldown plugin with aliases.
