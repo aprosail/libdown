@@ -8,5 +8,5 @@ program
   .description(description)
   .version(version)
   .option("-o --outdir <outdir>", "outdir of the bundles")
-  .action((_) => build())
+  .action(async (_) => build())
   .parse(argv)
