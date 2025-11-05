@@ -4,7 +4,13 @@
   "version": "0.0.0",
   "type": "module",
   "exports": {
-    "./tsconfig.json": "./tsconfig.share.json"
+    "./tsconfig.json": "./tsconfig.share.json",
+    ".": {
+      "types": "./out/index.d.ts",
+      "import": "./out/index.js",
+      "require": "./out/index.cjs",
+      "default": "./out/index.js"
+    }
   },
   "scripts": {
     "format": "prettier --write .",

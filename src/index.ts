@@ -1,4 +1,5 @@
 import { aliases } from "@/aliases"
+import { externals } from "@/externals"
 import {
   defineConfig,
   rolldown,
@@ -8,9 +9,10 @@ import {
 import { dts } from "rolldown-plugin-dts"
 
 export * from "@/aliases"
+export * from "@/externals"
 
 export function generateRolldownOptions() {
-  const plugins: RolldownPlugin[] = [aliases()]
+  const plugins: RolldownPlugin[] = [aliases(), externals()]
   const common = defineConfig({
     plugins,
     input: "src/index.ts",
