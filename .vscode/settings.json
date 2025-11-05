@@ -1,0 +1,39 @@
+// Those commented settings are just for references.
+// Don't uncomment them in this git-tracked settings.json file.
+// You may enable those settings for your local device globally.
+{
+  "files.encoding": "utf8",
+  "files.eol": "\n",
+  "editor.tabSize": 2,
+  "editor.rulers": [80],
+
+  // Format on save (require recommended extensions).
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": { "source.organizeImports": "always" },
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "[dotenv]": { "editor.defaultFormatter": "lumirelle.shell-format-rev" },
+  "[ignore]": { "editor.defaultFormatter": "lumirelle.shell-format-rev" },
+  "[properties]": { "editor.defaultFormatter": "lumirelle.shell-format-rev" },
+  "[shellscript]": { "editor.defaultFormatter": "lumirelle.shell-format-rev" },
+
+  // File nesting patterns (enable as you wish).
+  // "explorer.fileNesting.enabled": true,
+  // "explorer.fileNesting.expand": false,
+  "explorer.fileNesting.patterns": {
+    "*": "${capture}.map",
+    "*.js": "${capture}.d.ts, ${capture}.cjs",
+    "package.json": "pnpm-lock.yaml",
+    "readme.md": "license"
+  },
+
+  // Output bundle visualizations.
+  "files.associations": { "*.map": "json" },
+  "editor.wordWrapColumn": 80,
+  "[javascript]": { "editor.wordWrap": "wordWrapColumn" },
+  "[css]": { "editor.wordWrap": "wordWrapColumn" },
+  "[json]": { "editor.wordWrap": "wordWrapColumn" },
+
+  // Code spell checker (require recommended extensions).
+  "cSpell.ignorePaths": ["node_modules", "out", "pnpm-lock.yaml", "LICENSE"],
+  "cSpell.words": ["esbenp", "esbuild", "libdown", "lumirelle", "oxlint"]
+}
