@@ -45,7 +45,7 @@ export type PackageExternalOptions = PackageExternalOptionsBase & {
  */
 export function packageExternals(options?: PackageExternalOptions) {
   const {
-    root,
+    root = "",
     includes = [],
     excludes = [],
     dependencies = true,
@@ -55,7 +55,7 @@ export function packageExternals(options?: PackageExternalOptions) {
 
   const externals: string[] = []
   if (dependencies || devDependencies || peerDependencies) {
-    const manifestFile = join(root || "", "package.json")
+    const manifestFile = join(root, "package.json")
     const manifest = JSON.parse(readFileSync(manifestFile, "utf-8"))
 
     if (dependencies && manifest.dependencies)

@@ -1,5 +1,9 @@
-import { aliases, TsconfigAliases } from "@/aliases"
-import { externals, PackageExternalOptionsBase } from "@/externals"
+import { aliases } from "@/aliases"
+import { externals } from "@/externals"
+import { BuildOptions } from "@/options"
+import { cleanDir } from "@/utils"
+import chalk from "chalk"
+import { consola } from "consola"
 import { existsSync, globSync, statSync } from "node:fs"
 import { resolve } from "node:path"
 import {
@@ -13,40 +17,27 @@ import { dts } from "rolldown-plugin-dts"
 
 export * from "@/aliases"
 export * from "@/externals"
-
-export type SpecialBuildOption = {
-  mode: "lib" | "bin"
-  input: string // Not glob.
-  outdir: string
-}
+export * from "@/options"
 
 /**
- * Lib names will override bin names when conflict,
- * and special entries will override them all.
+ *
+ * @param options
+ * @returns
  */
-export type BuildOptions = {
-  root?: string
-  out?: string
-  bin?: string | string[] // Glob.
-  lib?: string | string[] // Glob.
-  specials?: Record<string, SpecialBuildOption>
-
-  tsconfig?: string | TsconfigAliases
-  external?: PackageExternalOptionsBase
-}
-
 export function generateRolldownOptions(options?: BuildOptions) {
   const {
-    root,
+    root = "",
     out = "out",
     bin = "src/main.ts",
     lib = "src/index.ts",
     specials,
+    cleanOutdir = true,
     tsconfig: t,
     external: e,
   } = options || {}
 
   // Common data.
+  const resolvedRoot = resolve(root)
   const builds: RolldownOptions[] = []
   const plugins: RolldownPlugin[] = [aliases(t), externals({ root, ...e })]
   const common = defineConfig({
@@ -56,8 +47,8 @@ export function generateRolldownOptions(options?: BuildOptions) {
       format: "esm",
       minify: true,
       sourcemap: true,
-      assetFileNames: "[hash].[ext]",
-      chunkFileNames: "[hash].js",
+      assetFileNames: "assets/[hash].[ext]",
+      chunkFileNames: "chunks/[hash].js",
       entryFileNames: "[name].js",
     },
   })
@@ -74,22 +65,67 @@ export function generateRolldownOptions(options?: BuildOptions) {
     builds.push({ ...lib, output: { ...lib.output, ...cJS } })
   }
 
-  // Special options.
+  /** @yields current resolved special options. */
   function* specialOptions(): Generator<RolldownOptions> {
     for (const [name, value] of Object.entries(specials || {})) {
-      if (existsSync(value.input) && statSync(value.input).isFile()) {
+      const { input, outdir, cleanOutdir } = value
+      if (existsSync(input) && statSync(input).isFile()) {
+        let shouldCleanOutdir = false
+        const inside = resolve(outdir).startsWith(resolvedRoot)
+
+        // Resolve cleanOutdir.
+        if (cleanOutdir) {
+          if (inside || cleanOutdir === "force") shouldCleanOutdir = true
+          if (!inside) {
+            consola.warn(
+              `cannot clean outdir(${chalk.dim(outdir)})` +
+                `outside root(${chalk.dim(root)}) ` +
+                `in special output from ${chalk.dim(input)}:` +
+                chalk.dim(`you can set ${chalk.yellow("cleanOutdir")} of`) +
+                chalk.dim(`this special build to ${chalk.yellow('"force"')}`) +
+                chalk.dim(`to enable clean outdir regardless where it is.`),
+            )
+          }
+        }
+
         yield defineConfig({
           plugins,
-          input: { [name]: value.input },
-          output: { ...common.output, dir: resolve(root || "", value.outdir) },
+          input: { [name]: input },
+          output: {
+            ...common.output,
+            dir: resolve(root, outdir),
+            cleanDir: shouldCleanOutdir,
+          },
         })
       }
+    }
+  }
+
+  // Resolve cleanOutdir.
+  if (cleanOutdir) {
+    const inside = resolve(out).startsWith(resolvedRoot)
+    if (inside || cleanOutdir === "force") cleanDir(out)
+    if (!inside) {
+      consola.warn(
+        `cannot clean outdir(${chalk.dim(out)}) ` +
+          `outside root(${chalk.dim(root)}): ` +
+          chalk.dim(`you can set ${chalk.yellow("cleanOutdir")} `) +
+          chalk.dim(`to ${chalk.yellow('"force"')}`) +
+          chalk.dim(`to enable clean outdir regardless where it is.`),
+      )
     }
   }
 
   return [...builds, ...specialOptions()]
 }
 
+/**
+ * Build as the provided or default {@link BuildOptions},
+ * preprocessed by {@link generateRolldownOptions},
+ * powered by Rolldown.
+ *
+ * @param options configure how to build.
+ */
 export async function build(options?: BuildOptions) {
   async function rolldownBuild(options: RolldownOptions) {
     const bundler = await rolldown(options)

@@ -3,6 +3,7 @@
   "description": "Bundle ts library within a single line of command.",
   "version": "0.0.0",
   "type": "module",
+  "bin": "./out/main.js",
   "exports": {
     "./tsconfig.json": "./tsconfig.share.json",
     ".": {
@@ -10,15 +11,35 @@
       "import": "./out/index.js",
       "require": "./out/index.cjs",
       "default": "./out/index.js"
+    },
+    "./aliases": {
+      "types": "./out/aliases.d.ts",
+      "import": "./out/aliases.js",
+      "require": "./out/aliases.cjs",
+      "default": "./out/aliases.js"
+    },
+    "./externals": {
+      "types": "./out/externals.d.ts",
+      "import": "./out/externals.js",
+      "require": "./out/externals.cjs",
+      "default": "./out/externals.js"
+    },
+    "./options": {
+      "types": "./out/options.d.ts",
+      "import": "./out/options.js",
+      "require": "./out/options.cjs",
+      "default": "./out/options.js"
     }
   },
   "scripts": {
     "format": "prettier --write .",
     "review": "prettier --check . && oxlint",
-    "build": "tsx src/main.ts --lib \"src/@(index|aliases|externals).ts\""
+    "build": "tsx src/main.ts -l \"src/@(index|aliases|externals|options).ts\""
   },
   "dependencies": {
+    "chalk": "^5.6.2",
     "commander": "^14.0.2",
+    "consola": "^3.4.2",
     "rolldown": "1.0.0-beta.47",
     "rolldown-plugin-dts": "^0.17.3"
   },
